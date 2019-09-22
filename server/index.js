@@ -12,13 +12,13 @@ wss.on('connection',function(ws){
 
     console.log("Received: " + message);
 
-    if (message === '右') {
+    if (message === '右' && x < 220) {
       x = x + 10
-    } else if (message === '左') {
+    } else if (message === '左' && x > 0) {
       x = x - 10
-    } else if (message === '下') {
+    } else if (message === '下' && y < 280) {
       y = y + 10
-    } else if (message === '上') {
+    } else if (message === '上' && y > 0) {
       y = y - 10
     }
     sendMessage('{ "x": ' + x + ', "y": ' + y + ' }')
