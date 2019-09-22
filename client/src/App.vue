@@ -65,11 +65,13 @@
       } catch (e) {
         console.log(e)
       }
+      document.addEventListener('touchend', this.avoidZoomByTap, false)
     },
     destroyed: function () {
       if (this.sock) {
         this.sock.removeEventListener('message', this.receiveMessage, false)
       }
+      document.removeEventListener('touched', this.avoidZoomByTap, false)
     },
     methods: {
       receiveMessage(e) {
@@ -80,6 +82,13 @@
       sendMessage(direction) {
         this.sock.send(direction)
         this.message = ''
+      },
+      // iPhoneでダブルタップ時に画面が拡大するのを避ける
+      avoidZoomByTap(event) {
+        event.preventDefault()
+        const evt = document.createEvent('HTMLEvents')
+        evt.initEvent('click', true, true )
+        event.target.dispatchEvent(evt)
       },
     },
   }
