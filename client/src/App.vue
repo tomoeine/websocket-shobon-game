@@ -59,29 +59,40 @@
       }
     },
     created() {
-      try {
-        this.sock = new WebSocket(process.env.VUE_APP_WEBSOCKET_URL)
-        this.sock.addEventListener('message', this.receiveMessage, false)
-      } catch (e) {
-        console.log(e)
-      }
+      this.openWebSocket()
       document.addEventListener('touchend', this.avoidZoomByTap, false)
     },
     destroyed: function () {
       if (this.sock) {
         this.sock.removeEventListener('message', this.receiveMessage, false)
+        if ( this.sock && this.sock.readyState === WebSocket.OPEN) {
+          this.ws.close()
+        }
       }
       document.removeEventListener('touched', this.avoidZoomByTap, false)
     },
     methods: {
+      openWebSocket() {
+        try {
+          this.sock = new WebSocket(process.env.VUE_APP_WEBSOCKET_URL)
+          this.sock.addEventListener('message', this.receiveMessage, false)
+        } catch (e) {
+          console.log(e)
+        }
+      },
       receiveMessage(e) {
         const obj = JSON.parse(e.data)
         this.shobon_x = obj.x
         this.shobon_y = obj.y
       },
       sendMessage(direction) {
-        this.sock.send(direction)
-        this.message = ''
+        if (this.sock.readyState === WebSocket.CLOSING || this.sock.readyState === WebSocket.CLOSED) {
+          this.openWebSocket()
+        }
+        if (this.sock.readyState === WebSocket.OPEN) {
+          this.sock.send(direction)
+          this.message = ''
+        }
       },
       // iPhoneでダブルタップ時に画面が拡大するのを避ける
       avoidZoomByTap(event) {
