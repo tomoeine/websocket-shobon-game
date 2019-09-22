@@ -59,11 +59,17 @@
       }
     },
     created() {
-      this.sock = new WebSocket('ws://' + location.hostname + ':8080')
-      this.sock.addEventListener('message', this.receiveMessage, false)
+      try {
+        this.sock = new WebSocket(process.env.VUE_APP_WEBSOCKET_URL)
+        this.sock.addEventListener('message', this.receiveMessage, false)
+      } catch (e) {
+        console.log(e)
+      }
     },
     destroyed: function () {
-      this.sock.removeEventListener('message', this.receiveMessage, false)
+      if (this.sock) {
+        this.sock.removeEventListener('message', this.receiveMessage, false)
+      }
     },
     methods: {
       receiveMessage(e) {
