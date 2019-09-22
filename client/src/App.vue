@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <h2>(´・ω・｀) をゴールに導こう！</h2>
+    <p>{{ clientsNum }} 人が接続中</p>
     <Shobon
-      :x="shobon_x"
-      :y="shobon_y"
+      :x="shobonX"
+      :y="shobonY"
     />
     <div class="buttons">
       <button
@@ -54,8 +55,9 @@
         sock: null,
         message: '',
         receivedMessage: '',
-        shobon_x: 0,
-        shobon_y: 0
+        shobonX: 0,
+        shobonY: 0,
+        clientsNum: 0,
       }
     },
     created() {
@@ -82,8 +84,9 @@
       },
       receiveMessage(e) {
         const obj = JSON.parse(e.data)
-        this.shobon_x = obj.x
-        this.shobon_y = obj.y
+        this.shobonX = obj.x
+        this.shobonY = obj.y
+        this.clientsNum = obj.clientsNum
       },
       sendMessage(direction) {
         if (this.sock.readyState === WebSocket.CLOSING || this.sock.readyState === WebSocket.CLOSED) {
@@ -116,7 +119,11 @@
   h2 {
     color: #333;
     font-size: 20px;
-    margin: 10px 0 10px;
+    margin: 10px 0 0;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 10px;
   }
   .buttons {
     margin-top: 10px;

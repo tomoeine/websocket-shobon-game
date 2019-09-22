@@ -3,10 +3,12 @@ const port = process.env.PORT || process.env.VUE_APP_PORT || 8080;
 const wss = new WebSocket.Server({ port: port });
 let x = 0
 let y = 0
+let num = 0
 
 wss.on('connection',function(ws){
 
-  sendMessage('{ "x": ' + x + ', "y": ' + y + ' }')
+  calcClients()
+  sendMessage()
 
   ws.on('message',function(message){
 
@@ -21,17 +23,33 @@ wss.on('connection',function(ws){
     } else if (message === '上' && y > 0) {
       y = y - 10
     }
-    sendMessage('{ "x": ' + x + ', "y": ' + y + ' }')
+    sendMessage()
   });
 
   ws.on('close',function(){
+    calcClients()
+    sendMessage()
     console.log('connection closed');
   });
 
 });
 
-const sendMessage = (message) => {
-  wss.clients.forEach(function(client){
-    client.send(message)
-  });
+const sendMessage = () => {
+  console.log(num)
+  for(const client of wss.clients) {
+    if (client.isAlive === false) {
+      return client.terminate()
+    }
+    client.send('{ "x": ' + x + ', "y": ' + y + ', "clientsNum": ' + num + ' }')
+  }
+}
+
+const calcClients = () => {
+  num = 0
+  for(const client of wss.clients) {
+    if (client.isAlive === false) {
+      return client.terminate()
+    }
+    num = num + 1
+  }
 }
