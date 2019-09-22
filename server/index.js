@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8080 });
+const port = process.env.PORT || process.env.VUE_APP_PORT || 8080;
+const wss = new WebSocket.Server({ port: port });
 let x = 0
 let y = 0
 
