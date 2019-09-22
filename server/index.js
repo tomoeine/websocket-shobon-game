@@ -35,7 +35,6 @@ wss.on('connection',function(ws){
 });
 
 const sendMessage = () => {
-  console.log(num)
   for(const client of wss.clients) {
     if (client.isAlive === false) {
       return client.terminate()
