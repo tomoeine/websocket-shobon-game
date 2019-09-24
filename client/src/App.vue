@@ -37,9 +37,17 @@
       </button>
     </div>
 
-    <p id="received-message">
-      {{ receivedMessage }}
-    </p>
+    <div
+        class="error"
+        v-if="serverError"
+    >
+      <p>
+        （´・ω:;.:…<br>
+        おっと、どうやらサーバーとの接続がうまくいかないようです<br>
+        しばらく待ってもこのメッセージが消えなければ、再読み込みを試してください<br>
+        （´:;….::;.:. :::;.. …..
+      </p>
+    </div>
   </div>
 </template>
 
@@ -53,10 +61,10 @@
     data() {
       return {
         sock: null,
-        receivedMessage: '',
         shobonX: 0,
         shobonY: 0,
         clientsNum: 0,
+        serverError: false,
       }
     },
     created() {
@@ -66,20 +74,20 @@
     destroyed: function () {
       if (this.sock) {
         this.sock.removeEventListener('message', this.receiveMessage, false)
+        this.sock.removeEventListener('open', this.onOpen, false)
+        this.sock.removeEventListener('error', this.onError, false)
         if ( this.sock && this.sock.readyState === WebSocket.OPEN) {
-          this.ws.close()
+          this.sock.close()
         }
       }
       document.removeEventListener('touched', this.avoidZoomByTap, false)
     },
     methods: {
       openWebSocket() {
-        try {
-          this.sock = new WebSocket(process.env.VUE_APP_WEBSOCKET_URL)
-          this.sock.addEventListener('message', this.receiveMessage, false)
-        } catch (e) {
-          console.log(e)
-        }
+        this.sock = new WebSocket(process.env.VUE_APP_WEBSOCKET_URL)
+        this.sock.addEventListener('message', this.receiveMessage, false)
+        this.sock.addEventListener('open', this.onOpen, false)
+        this.sock.addEventListener('error', this.onError, false)
       },
       receiveMessage(e) {
         const obj = JSON.parse(e.data)
@@ -94,6 +102,14 @@
         if (this.sock.readyState === WebSocket.OPEN) {
           this.sock.send(direction)
         }
+      },
+      onOpen() {
+        this.serverError = false
+      },
+      onError(e) {
+        console.log(e)
+        this.serverError = true
+        setTimeout(this.openWebSocket, 1000)
       },
       // iPhoneでダブルタップ時に画面が拡大するのを避ける
       avoidZoomByTap(event) {
@@ -139,5 +155,24 @@
   }
   .ml-10 {
     margin-left: 100px;
+  }
+  .error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10002;
+    text-align: center;
+  }
+  .error p {
+    position: relative;
+    top: 100px;
+    margin: auto;
+    font-weight: bold;
+    font-size: 24px;
+    width: 400px;
   }
 </style>
