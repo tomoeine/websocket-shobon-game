@@ -53,7 +53,6 @@
     data() {
       return {
         sock: null,
-        message: '',
         receivedMessage: '',
         shobonX: 0,
         shobonY: 0,
@@ -94,7 +93,6 @@
         }
         if (this.sock.readyState === WebSocket.OPEN) {
           this.sock.send(direction)
-          this.message = ''
         }
       },
       // iPhoneでダブルタップ時に画面が拡大するのを避ける
