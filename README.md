@@ -3,6 +3,8 @@
 ブラウザで遊べる (´・ω・｀) のゲームです。  
 WebSocket だから、みんなで接続すると楽しい！
 
+デモ環境：http://shobon.herokuapp.com/
+
 ![image](https://user-images.githubusercontent.com/31984716/65368361-1ac95100-dc7b-11e9-84d6-466c53dfe976.png)
 
 
